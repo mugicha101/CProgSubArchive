@@ -1,0 +1,105 @@
+/*
+Gold 4
+22927 - Mountainous Palindromic Subarray
+meta: {"problemId": 22927, "titleKo": "Mountainous Palindromic Subarray", "titles": [{"language": "en", "languageDisplayName": "en", "title": "Mountainous Palindromic Subarray", "isOriginal": true}], "isSolvable": true, "isPartial": false, "acceptedUserCount": 58, "level": 12, "votedUserCount": 12, "sprout": false, "givesNoRating": false, "isLevelLocked": false, "averageTries": 1.6723999977111816, "official": true, "tags": [{"key": "bruteforcing", "isMeta": false, "bojTagId": 125, "problemCount": 2803, "displayNames": [{"language": "ko", "name": "브루트포스 알고리즘", "short": "브루트포스 알고리즘"}, {"language": "en", "name": "bruteforcing", "short": "bruteforce"}, {"language": "ja", "name": "全探索", "short": "全探索"}], "aliases": [{"alias": "완전탐색"}, {"alias": "완전 탐색"}, {"alias": "브루트포스"}, {"alias": "bruteforce"}, {"alias": "brute force"}, {"alias": "완탐"}]}, {"key": "two_pointer", "isMeta": false, "bojTagId": 80, "problemCount": 490, "displayNames": [{"language": "ko", "name": "두 포인터", "short": "두 포인터"}, {"language": "en", "name": "two-pointer", "short": "two-pointer"}, {"language": "ja", "name": "尺取り法", "short": "尺取り"}], "aliases": [{"alias": "투포인터"}, {"alias": "인치웜"}, {"alias": "inchworm"}, {"alias": "twopointer"}]}], "metadata": {}}
+*/
+
+#define _USE_MATH_DEFINES
+#include <bits/stdc++.h>
+#include <bits/extc++.h>
+
+using namespace std;
+using namespace std::chrono_literals;
+
+// using namespace __gnu_pbds;
+// template <class T>
+// using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+// template <class T>
+// using ordered_multiset = tree<T, null_type, less_equal<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+#define MOD 998244353
+#define rep(i, a, b) for(int i = a; i < (b); ++i)
+#define all(x) begin(x), end(x)
+#define sz(x) (int)(x).size()
+
+typedef unsigned int uint;
+typedef long long ll;
+typedef long double ld;
+typedef unsigned long long ull;
+
+const ld ROT_HALF = 3.14159265358979323846L;
+const ld ROT_FULL = ROT_HALF * 2.L;
+const ld ROT_QUARTER = ROT_HALF * 0.5L;
+
+template <typename T,typename U>                                                   
+pair<T,U> operator+(const pair<T,U> & l,const pair<T,U> & r) {   
+    return {l.first+r.first,l.second+r.second};                                    
+}
+template <typename T,typename U>         
+pair<T,U> operator-(const pair<T,U> & l,const pair<T,U> & r) {   
+    return {l.first-r.first,l.second-r.second};                                    
+}
+template<typename A, typename B> ostream& operator<<(ostream &os, const pair<A, B> &p) { return os << '(' << p.first << ", " << p.second << ')'; }
+template<typename T> ostream& operator<<(ostream &os, const vector<T> &v) {
+    os << "[";
+    for (size_t i = 0; i < v.size(); ++i) { 
+        os << v[i]; 
+        if (i != v.size() - 1) 
+            os << ", "; 
+    }
+    os << "]";
+    return os;
+}
+
+const ll INF = LLONG_MAX >> 2;
+
+#define EPS 1e-9
+#define each(i, x) for (auto &i : x)
+#define vcin(x) for (auto &_e : x) cin >> _e;
+#define mp(a,b) make_pair(a,b)
+#define pause() this_thread::sleep_for(10ms)
+
+inline void madd(int &x, int v) {
+    x += v;
+    x = x >= MOD ? x - MOD : x;
+}
+
+double randDbl() {
+    return (double)rand() / (double)RAND_MAX;
+}
+uint64_t microsecs() {
+    return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+}
+
+struct query {
+    int key;
+    int start;
+    int end;
+};
+
+inline ll magSqd(pair<ll,ll> p) {
+    return p.first * p.first + p.second * p.second;
+}
+
+inline ll distSqd(pair<ll,ll> p, pair<ll,ll> q) {
+    return magSqd({p.first - q.first, p.second - q.second});
+}
+
+inline bool isValid(pair<ll,ll> p, pair<ll,ll> q) {
+    return max(magSqd(p), magSqd(q)) < distSqd(p, q);
+}
+
+int main() {
+    cin.tie()->sync_with_stdio(0);
+    cout << fixed << setprecision(12);
+
+    int n; cin >> n;
+    vector<int> arr(n); vcin(arr);
+    int best = 0;
+    for (int i = 0; i < n; ++i) {
+        int l = 0;
+        while (i-l-1 >= 0 && i+l+1 < n && arr[i-l-1] < arr[i-l] && arr[i-l-1] == arr[i+l+1]) ++l;
+        best = max(best, l*2+1);
+    }
+    cout << (best < 3 ? -1 : best) << endl;
+}

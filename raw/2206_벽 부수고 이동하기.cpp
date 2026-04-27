@@ -1,0 +1,97 @@
+#define _USE_MATH_DEFINES
+#include <bits/stdc++.h>
+ 
+using namespace std;
+ 
+typedef long long ll;
+typedef long double ld;
+typedef unsigned long long ull;
+ 
+const int MOD = 1000000007;
+
+const ld ROT_HALF = 3.14159265358979323846L;
+const ld ROT_FULL = ROT_HALF * 2.L;
+const ld ROT_QUARTER = ROT_HALF * 0.5L;
+
+template <typename T,typename U>                                                   
+std::pair<T,U> operator+(const std::pair<T,U> & l,const std::pair<T,U> & r) {   
+    return {l.first+r.first,l.second+r.second};                                    
+}
+template <typename T,typename U>         
+std::pair<T,U> operator-(const std::pair<T,U> & l,const std::pair<T,U> & r) {   
+    return {l.first-r.first,l.second-r.second};                                    
+}
+template<typename A, typename B> ostream& operator<<(ostream &os, const pair<A, B> &p) { return os << '(' << p.first << ", " << p.second << ')'; }
+
+using namespace std;
+
+using ll = long long;
+const ll INF = LLONG_MAX >> 2;
+
+#define EPS 1e-7
+#define all(x) x.begin(), x.end()
+#define sz(x) ((int)x.size())
+
+void dfs(vector<pair<char,char>> &nodes, char curr, string &preorder, string &inorder, string &postorder) {
+    pair<char,char> desc = nodes[curr - 'A'];
+    preorder += curr;
+    if (desc.first != '.') dfs(nodes, desc.first, preorder, inorder, postorder);
+    inorder += curr;
+    if (desc.second != '.') dfs(nodes, desc.second, preorder, inorder, postorder);
+    postorder += curr;
+}
+
+int main() {
+    // env setup
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    // cout.tie(0); // comment out for baekjoon
+    cout << fixed << setprecision(12);
+
+    int rows, cols; cin >> rows >> cols;
+    vector<vector<vector<bool>>> visited(2, vector<vector<bool>>(rows, vector<bool>(cols, false)));
+    vector<vector<bool>> walls(rows, vector<bool>(cols));
+    for (int r = 0; r < rows; ++r) {
+        for (int c = 0; c < cols; ++c) {
+            char v; cin >> v;
+            walls[r][c] = v == '1';
+        }
+    }
+
+    queue<tuple<int,int,int>> q;
+    visited[0][0][0] = true;
+    q.emplace(0, 0, 0);
+    int dist = 0;
+    auto endReached = [&]() {
+        return visited[0][rows-1][cols-1] || visited[1][rows-1][cols-1];
+    };
+    while (!q.empty() && !endReached()) {
+        ++dist;
+        for (int qi = (int)q.size(); qi > 0; --qi) {
+            auto [b, r, c] = q.front();
+            q.pop();
+            auto check = [&](int r, int c) {
+                int nb = b + walls[r][c];
+                if (nb == 2 || visited[nb][r][c]) return;
+
+                visited[nb][r][c] = true;
+                q.emplace(nb, r, c);
+            };
+            if (r) check(r-1, c);
+            if (c) check(r, c-1);
+            if (r+1 < rows) check(r+1, c);
+            if (c+1 < cols) check(r, c+1);
+        }
+
+        /*
+        for (int r = 0; r < rows; ++r) {
+            for (int c = 0; c < cols; ++c) {
+                cout << (visited[0][r][c] ? '1' : visited[1][r][c] ? '2' : walls[r][c] ? '#' : '.');
+            }
+            cout << endl;
+        }
+        cout << endl;
+        */
+    }
+    cout << (endReached()? dist + 1 : -1) << endl;
+}
