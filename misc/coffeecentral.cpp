@@ -1,3 +1,6 @@
+// Title: Coffee Central
+// Problem E from ICPC World Finals 2011
+
 #include <cmath>
 #include <limits>
 #include <random>
