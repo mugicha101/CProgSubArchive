@@ -1,0 +1,106 @@
+// 2026-08-09 22:56:23 
+/*
+Diamond 4
+32018 - Collusion on Two Wheels
+meta: {"problemId": 32018, "titleKo": "Collusion on Two Wheels", "titles": [{"language": "en", "languageDisplayName": "en", "title": "Collusion on Two Wheels", "isOriginal": true}], "isSolvable": true, "isPartial": false, "acceptedUserCount": 11, "level": 22, "votedUserCount": 2, "sprout": false, "givesNoRating": false, "isLevelLocked": false, "averageTries": 1.3636000156402588, "official": true, "tags": [{"key": "sweeping", "isMeta": false, "bojTagId": 106, "problemCount": 708, "displayNames": [{"language": "ko", "name": "스위핑", "short": "스위핑"}, {"language": "en", "name": "sweeping", "short": "sweeping"}, {"language": "ja", "name": "平面走査", "short": "平面走査"}], "aliases": [{"alias": "라인 스위핑"}]}, {"key": "parametric_search", "isMeta": false, "bojTagId": 170, "problemCount": 544, "displayNames": [{"language": "ko", "name": "매개 변수 탐색", "short": "매개 변수 탐색"}, {"language": "en", "name": "parametric search", "short": "parametric search"}, {"language": "ja", "name": "parametric search", "short": "parametric search"}], "aliases": [{"alias": "파라메트릭"}]}], "metadata": {}}
+*/
+
+#include <bits/stdc++.h>
+ 
+using namespace std;
+ 
+typedef long long ll;
+typedef long double ld;
+typedef unsigned long long ull;
+ 
+const int MOD = 1000000007;
+
+const ld ROT_HALF = 3.14159265358979323846L;
+const ld ROT_FULL = ROT_HALF * 2.L;
+const ld ROT_QUARTER = ROT_HALF * 0.5L;
+
+template <typename T,typename U>                                                   
+std::pair<T,U> operator+(const std::pair<T,U> & l,const std::pair<T,U> & r) {   
+    return {l.first+r.first,l.second+r.second};                                    
+}
+template <typename T,typename U>         
+std::pair<T,U> operator-(const std::pair<T,U> & l,const std::pair<T,U> & r) {   
+    return {l.first-r.first,l.second-r.second};                                    
+}
+template<typename A, typename B> ostream& operator<<(ostream &os, const pair<A, B> &p) { return os << '(' << p.first << ", " << p.second << ')'; }
+
+using namespace std;
+
+using ll = long long;
+const ll INF = LLONG_MAX >> 2;
+
+#define all(x) x.begin(), x.end()
+
+int main() {
+    // env setup
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    // cout.tie(0); // comment out for baekjoon
+    cout << fixed << setprecision(12);
+
+    int n;
+    cin >> n;
+    vector<pair<int,int>> points(n);
+    for (auto &[x, y] : points) cin >> x >> y;
+
+    auto dist = [&](int i, int j) {
+        return abs(points[i].first - points[j].first) + abs(points[i].second - points[j].second);
+    };
+
+    vector<tuple<int,int,int>> edges;
+    edges.reserve(n * n);
+    for (int i = 0; i < n; ++i) {
+        for (int j = i+1; j < n; ++j) {
+            edges.emplace_back(dist(i, j), i, j);
+        }
+    }
+    sort(edges.begin(), edges.end());
+    
+    // bipartite checker
+    vector<char> color(n);
+    auto calc = [&](int k) {
+        fill(all(color), 0);
+        vector<vector<int>> adj(n);
+        for (int i = edges.size()-1; i >= 0 && get<0>(edges[i]) > k; --i) {
+            auto [d, a, b] = edges[i];
+            adj[a].push_back(b);
+            adj[b].push_back(a);
+        }
+        queue<int> q;
+        for (int i = 0; i < n; ++i) {
+            if (color[i]) continue;
+
+            color[i] = 1;
+            q.push(i);
+            while (!q.empty()) {
+                int curr = q.front();
+                q.pop();
+                for (int next : adj[curr]) {
+                    if (color[next] == 0) {
+                        color[next] = 3 - color[curr];
+                        q.push(next);
+                    } else if (color[next] != 3 - color[curr]) return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    // bsearch to find k such that all edges longer than k form bipartite graph
+    int l = 0;
+    int r = get<0>(edges.back());
+    while (l != r) {
+        int k = (l + r) >> 1;
+        if (calc(k)) {
+            r = k;
+        } else {
+            l = k+1;
+        }
+    }
+    cout << l << endl;
+}
